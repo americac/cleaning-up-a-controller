@@ -1,9 +1,7 @@
 class ExpensesController < ApplicationController
   def index
     @user = User.find(user_id)
-
-    @expenses = get_my_expenses
-
+    @expenses = get_expenses
   end
 
   def new
@@ -16,9 +14,7 @@ class ExpensesController < ApplicationController
     @expense = user.expenses.new(expense_params)
 
     if @expense.save
-      email_body = "#{@expense.name} by #{user.full_name} needs to be approved"
-      mailer = ExpenseMailer.new(address: 'admin@expensr.com', body: email_body)
-      mailer.deliver
+      send_email(user)
 
       redirect_to user_expenses_path(user)
     else
@@ -58,7 +54,13 @@ class ExpensesController < ApplicationController
 
   private
 
-  def get_my_expenses
+  def send_email(user)
+    email_body = "#{@expense.name} by #{user.full_name} needs to be approved"
+    mailer = ExpenseMailer.new(address: 'admin@expensr.com', body: email_body)
+    mailer.deliver
+  end
+
+  def get_expenses
     if approved.nil?
       expenses = Expense.where(user: @user, deleted: false)
     else
