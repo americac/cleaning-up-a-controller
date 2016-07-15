@@ -1,28 +1,28 @@
 class ExpensesController < ApplicationController
   def index
-    @user = User.find(params[:user_id])
+    @user = User.find(user_id)
 
-    if params[:approved].nil?
+    if approved.nil?
       @expenses = Expense.where(user: @user, deleted: false)
     else
-      @expenses = Expense.where(user: @user, approved: params[:approved], deleted: false)
+      @expenses = Expense.where(user: @user, approved: approved, deleted: false)
     end
 
-    if !params[:min_amount].nil?
-      @expenses = @expenses.where('amount > ?', params[:min_amount])
+    if !min_amount.nil?
+      @expenses = @expenses.where('amount > ?', min_amount)
     end
 
-    if !params[:max_amount].nil?
-      @expenses = @expenses.where('amount < ?', params[:max_amount])
+    if !max_amount.nil?
+      @expenses = @expenses.where('amount < ?', max_amount)
     end
   end
 
   def new
-    @user = User.find(params[:user_id])
+    @user = User.find(user_id)
   end
 
   def create
-    user = User.find(params[:user_id])
+    user = User.find(user_id)
 
     @expense = user.expenses.new(expense_params)
 
@@ -38,9 +38,9 @@ class ExpensesController < ApplicationController
   end
 
   def update
-    user = User.find(params[:user_id])
+    user = User.find(user_id)
 
-    @expense = user.expenses.find(params[:id])
+    @expense = user.expenses.find(id)
 
     if !@expense.approved
       @expense.update_attributes!(expense_params)
@@ -53,21 +53,45 @@ class ExpensesController < ApplicationController
   end
 
   def approve
-    @expense = Expense.find(params[:expense_id])
+    @expense = Expense.find(expense_id)
     @expense.update_attributes!(approved: true)
 
     render :show
   end
 
   def destroy
-    expense = Expense.find(params[:id])
-    user = User.find(params[:user_id])
+    expense = Expense.find(id)
+    user = User.find(user_id)
     expense.update_attributes!(deleted: true)
 
     redirect_to user_expenses_path(user_id: user.id)
   end
 
   private
+
+  def expense_id
+    params[:expense_id]
+  end
+
+  def approved
+    params[:approved]
+  end
+
+  def min_amount
+    params[:min_amount]
+  end
+
+  def max_amount
+    params[:max_amount]
+  end
+
+  def id
+    params[:id]
+  end
+
+  def user_id
+    params[:user_id]
+  end
 
   def expense_params
     params.require(:expense).permit(:name, :amount, :approved)
