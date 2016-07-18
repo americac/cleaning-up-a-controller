@@ -1,4 +1,3 @@
-#
 class ExpensesController < ApplicationController
 
   def index
