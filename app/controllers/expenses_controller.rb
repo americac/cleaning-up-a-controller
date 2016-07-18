@@ -1,4 +1,5 @@
 class ExpensesController < ApplicationController
+
   def index
     @user = User.find(user_id)
     @expenses = get_expenses
