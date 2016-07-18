@@ -15,7 +15,6 @@ class ExpensesController < ApplicationController
 
     if @expense.save
       send_email(user)
-
       redirect_to user_expenses_path(user)
     else
       render :new, status: :bad_request
